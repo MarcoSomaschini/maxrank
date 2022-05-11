@@ -751,6 +751,13 @@ long int QuadTree::naiveInNodeIntersection(vector<std::pair<long, QuadNode *> > 
                         if (minOrder >= (HammingDistance + NoOfCoveredHS - tao)) {
                             if (minOrder == INT_MAX)
                                 minOrder = HammingDistance + NoOfCoveredHS;
+                            if (minOrder > (HammingDistance + NoOfCoveredHS - tao)) {
+                                if (verbose)
+                                    cout << "Found a cell with lower overall order!" << endl;
+                                minOrder = HammingDistance + NoOfCoveredHS;
+                                minCellHalfSpaces.clear();
+                                binaryString.clear();
+                            }
                             set<long int> tmpSet;
                             std::copy((itr1->second->intersectedHalfspace).begin(),
                                       (itr1->second->intersectedHalfspace).end(),
