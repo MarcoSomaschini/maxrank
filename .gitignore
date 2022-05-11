@@ -1,2 +1,4 @@
 # CMake build directory
 cmake-build-debug
+# Temporary files
+tmp/*

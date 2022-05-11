@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="myQuadTree" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-p 4096 -d 4 -i idx4 -f RectUni4D100K.txt -q Queries100K.txt -r 5 -m AA -h 7 -t 0 -o 0 -v" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://../bin" PASS_PARENT_ENVS_2="true" PROJECT_NAME="maxrank" TARGET_NAME="myQuadTree" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="maxrank" RUN_TARGET_NAME="myQuadTree">
+  <configuration default="false" name="myQuadTree" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-p 4096 -d 4 -i ../tmp/idx4 -f RectUni4D100K.txt -q Queries100K.txt -r 5 -m AA -h 7 -t 0 -o 0 -v" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://../bin" PASS_PARENT_ENVS_2="true" PROJECT_NAME="maxrank" TARGET_NAME="myQuadTree" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="maxrank" RUN_TARGET_NAME="myQuadTree">
     <method v="2">
       <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
     </method>
