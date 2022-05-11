@@ -698,6 +698,13 @@ int main(const int a_argc, const char **a_argv) {
 // int pos[6];
 // findTopKfromDB(PG, objcnt, dimen, pos);  
 
+    FILE *myout;
+    myout = fopen("./myout.txt", "w");
+    if (myout == nullptr) {
+        printf("My file wasn't correctly opened");
+        exit(1);
+    }
+
     //srand(time(NULL));
     float NoOfTotalHSsProcessed = 0;
     for (int round = 0; round < Repeat; round++) {
@@ -761,7 +768,7 @@ int main(const int a_argc, const char **a_argv) {
         cout << "Query point " << round + 1 << " (id=" << rdIdx << "): ";
         for (int j = 0; j < dimen; j++) cout << pt[j] << " ";
         cout << endl;
-        getchar();
+        //getchar();
         //*/
         //end of query workload generation
 
@@ -801,6 +808,8 @@ int main(const int a_argc, const char **a_argv) {
         TimeCost = TimeCost + float(ed - st) * 1000 / CLOCKS_PER_SEC;
         IOs = IOs + a_DiskPage.size();
         cout << "Minimal cell computation finished! Method=" << methodName << endl;
+
+        fprintf(myout, "%ld,%d\n", rdIdx, min_k);
 
         totalMin_K = totalMin_K + min_k;
 
@@ -860,7 +869,9 @@ int main(const int a_argc, const char **a_argv) {
 
     }//end of repeat
 
-    /*/measuring IO cost when different size (i.e., 1%,2%,5%,10%) of buffers are given 
+    fclose(myout);
+
+    /*/measuring IO cost when different size (i.e., 1%,2%,5%,10%) of buffers are given
     int tmpIO1=IOMeasure::lru(a_PagesRead,int(0.01*cnt));
     int tmpIO2=IOMeasure::lru(a_PagesRead,int(0.02*cnt));
     int tmpIO5=IOMeasure::lru(a_PagesRead,int(0.05*cnt));

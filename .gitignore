@@ -2,3 +2,5 @@
 cmake-build-debug
 # Temporary files
 tmp/*
+# Output file
+bin/myout.txt
