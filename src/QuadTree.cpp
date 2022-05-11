@@ -424,14 +424,14 @@ bool QuadTree::GenHammingHalfSpaces(char *OutFileName, const int Dimen, vector<c
         int index = 0;
         long int count = 0;
         for (vector<long int>::iterator sItr = HalfSpaceIDs.begin(); sItr != HalfSpaceIDs.end(); sItr++) {
-            if (HammingString[index] == '1')    //for the case where ax_1+bx_2+... <= d
+            if (HammingString[index] == '0')    //for the case where ax_1+bx_2+... <= d    1
             {
                 long int hsID = *sItr;
                 float sum = 0;
                 for (int i = 0; i < Dimen; i++)
                     sum = sum + HalfSpaces[hsID][i] * InteriorPt[i];
                 if (sum <= HalfSpaces[hsID][Dimen]) count++;
-            } else if (HammingString[index] == '0')   //for the case where ax_1+bx_2+... > d
+            } else if (HammingString[index] == '1')   //for the case where ax_1+bx_2+... > d   0
             {
                 long int hsID = *sItr;
                 float sum = 0;
@@ -487,13 +487,13 @@ bool QuadTree::GenHammingHalfSpaces(char *OutFileName, const int Dimen, vector<c
 
     int index = 0;
     for (vector<long int>::iterator sItr = HalfSpaceIDs.begin(); sItr != HalfSpaceIDs.end(); sItr++) {
-        if (HammingString[index] == '1')    //for the case where ax_1+bx_2+... <= d
+        if (HammingString[index] == '0')    //for the case where ax_1+bx_2+... <= d  1
         {
             long int hsID = *sItr;
             for (int i = 0; i < Dimen; i++)
                 fprintf(fout1, "%f ", HalfSpaces[hsID][i]);
             fprintf(fout1, "%f\n", -HalfSpaces[hsID][Dimen]);   //the offset
-        } else if (HammingString[index] == '0')   //for the case where ax_1+bx_2+... > d
+        } else if (HammingString[index] == '1')   //for the case where ax_1+bx_2+... > d   0
         {
             long int hsID = *sItr;
             for (int i = 0; i < Dimen; i++)
