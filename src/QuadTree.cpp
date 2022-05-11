@@ -571,7 +571,7 @@ long int QuadTree::naiveInNodeIntersection(vector<std::pair<long, QuadNode *> > 
         bool isValid = MbrIsValid(Dimen, queryPlane, (*itr).second->MBR, Comb);
         if (!isValid) {
             if (verbose)
-                cout << "Leaf node " << (*itr).second->NodeID << " is pruned!" << endl << endl;
+                cout << endl << "Leaf node " << (*itr).second->NodeID << " is pruned!" << endl << endl;
             NoOfInvalidLeaves++;
             ++itr;
             continue;
@@ -787,15 +787,14 @@ long int QuadTree::naiveInNodeIntersection(vector<std::pair<long, QuadNode *> > 
     }
 
     //cout << "Number of invalid leaf nodes = " << NoOfInvalidLeaves << endl;
-    if (verbose)
-        cout << "#min-Cells found: " << minCellHalfSpaces.size() << ", minOrder=" << minOrder + NoOfCoveredHS << endl;
+    if (verbose) cout << "#min-Cells found: " << minCellHalfSpaces.size() << ", minOrder=" << minOrder << endl;
 
     totalNoOfBitStringsProcessed = totalNoOfBitStringsProcessed + NoOfBitStringsProcessed;
     totalNoOfZeroExtentBinStrings = totalNoOfZeroExtentBinStrings + NoOfZeroExtentBinStrings;
     totalNoOfDiscardedCells = totalNoOfDiscardedCells + NoOfDiscardedCells;
 
     if (minOrder == INT_MAX) return NoOfCoveredHS;
-    return minOrder + NoOfCoveredHS;
+    return minOrder;
 }
 
 long int QuadTree::optimizedInNodeIntersection(vector<std::pair<long, QuadNode *> > &Leaves,
