@@ -570,7 +570,8 @@ long int QuadTree::naiveInNodeIntersection(vector<std::pair<long, QuadNode *> > 
         for (int i = 0; i < Dimen + 1; i++) queryPlane[i] = 1;
         bool isValid = MbrIsValid(Dimen, queryPlane, (*itr).second->MBR, Comb);
         if (!isValid) {
-            //cout << "Leaf node " << (*itr).second->NodeID << " is pruned!" << endl;
+            if (verbose)
+                cout << "Leaf node " << (*itr).second->NodeID << " is pruned!" << endl << endl;
             NoOfInvalidLeaves++;
             ++itr;
             continue;
@@ -612,10 +613,17 @@ long int QuadTree::naiveInNodeIntersection(vector<std::pair<long, QuadNode *> > 
         //perform in-node halfspace intersection for nodes sorting in ascending order according to the number of intersected halfspaces
         for (multimap<long, QuadNode *>::iterator itr1 = nodesToIntersect.begin();
              itr1 != nodesToIntersect.end(); itr1++) {
+            if (verbose)
+                cout << endl << "Processing Leaf node " << (*itr1).second->NodeID << endl;
+
             NoOfHalfSpacesInNode = itr1->first;
 
             NoOfNodesLeft--;
-            if (NoOfHalfSpacesInNode <= 1) continue;
+            if (NoOfHalfSpacesInNode < 1) {
+                if (verbose)
+                    cout << "The node do not contain any halfspaces, skipping..." << endl;
+                continue;
+            }
             if (NoOfNodesLeft % 1000 == 0)
                 cout << "Number of nodes left to process :" << NoOfNodesLeft << endl;
             //intersect the halfspaces in each leaf node
@@ -647,12 +655,13 @@ long int QuadTree::naiveInNodeIntersection(vector<std::pair<long, QuadNode *> > 
                     }
 
                     NoOfBitStringsProcessed++;
+                    /* Too much blob
                     if (verbose)
                         cout << "Hamming Dist=" << HammingDistance << ", Mininmal Order=" << minOrder << ", #coveredHS="
                              << NoOfCoveredHS << ", #intersectedHS=" << NoOfHalfSpacesInNode << endl;
                     if (verbose)
                         cout << "Testing Hamming string: "
-                             << string(itrHamming->second.begin(), itrHamming->second.end()) << endl;
+                             << string(itrHamming->second.begin(), itrHamming->second.end()) << endl;*/
 
                     if (HammingDistance != itrHamming->first) {
                         if (verbose)
@@ -747,8 +756,11 @@ long int QuadTree::naiveInNodeIntersection(vector<std::pair<long, QuadNode *> > 
                         cout << "#min-cells found so far:" << minCellHalfSpaces.size() << endl;
                 }
                 if (!stopIncrHammingDist) HammingDistance++;
-                if (minOrder < INT_MAX && minOrder < (HammingDistance + NoOfCoveredHS - tao))
+                if (minOrder < INT_MAX && minOrder < (HammingDistance + NoOfCoveredHS - tao)) {
+                    if (verbose)
+                        cout << "There aren't any other mincells within this node, proceding..." << endl;
                     break;
+                }
                 else {
                     if (verbose)
                         cout << "Next, process bit-string with Hamming dist: " << HammingDistance << endl;
