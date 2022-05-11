@@ -2858,13 +2858,13 @@ int S3::BA_2D(    //BA algorithm for 2-d case, i.e., FCA algorithm
 
         if (i == 0) //skip the dominees of a_pt
         {
-            NoOfDominees = ResultID[0].size();
+            NoOfDominees = ResultID[0].size() - 1;
             continue;
         }
 
         if (i == 2)  //skip the dominators of a_pt
         {
-            NoOfDominators = ResultID[2].size();
+            NoOfDominators = ResultID[2].size() - 1;
             continue;
         }
 
@@ -2874,7 +2874,7 @@ int S3::BA_2D(    //BA algorithm for 2-d case, i.e., FCA algorithm
             {
                 long int id = (*vecItr);
 
-                float rd[2] = {(PG[id][0] + PG[id][2]) / 2.0, (PG[id][1] + PG[id][3]) / 2.0};
+                double rd[2] = {(PG[id][0] + PG[id][2]) / 2.0, (PG[id][1] + PG[id][3]) / 2.0};
 
                 int tmpDim = 0;
                 for (int d = 0; d < dimen; d++)
@@ -2886,7 +2886,7 @@ int S3::BA_2D(    //BA algorithm for 2-d case, i.e., FCA algorithm
                     continue;
                 }
 
-                if (rd[1] > a_pt[1]) initOrder++;  //obtain the initial order of current query point
+                if (a_pt[1] <= rd[1]) initOrder++;  //obtain the initial order of current query point
 
                 float denominator = rd[0] - rd[1] - a_pt[0] + a_pt[1];
                 float crosspoint;
@@ -2911,16 +2911,18 @@ int S3::BA_2D(    //BA algorithm for 2-d case, i.e., FCA algorithm
     }
     set<long int> tmpSet;
     Intersections.insert(VT(1, tmpSet));
-    initOrder++;
+    //initOrder++;
     //cout << "Initial order: " << initOrder << ", #intersections: "<< Intersections.size() << endl;
     //getchar();
 
     CellsWithOrder.insert(VT1(0, initOrder));  //the first cell from the left most intersection point 0
     min_k = initOrder;
     for (mItr = Intersections.begin(); mItr != Intersections.end(); mItr++) {
+        if (mItr->first == 1) continue;
+
         for (sItr = mItr->second.begin(); sItr != mItr->second.end(); sItr++) {
             long int id = (*sItr);
-            float rd[2] = {(PG[id][0] + PG[id][2]) / 2.0, (PG[id][1] + PG[id][3]) / 2.0};
+            double rd[2] = {(PG[id][0] + PG[id][2]) / 2.0, (PG[id][1] + PG[id][3]) / 2.0};
 
             if (rd[0] > a_pt[0])
                 initOrder++;
