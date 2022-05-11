@@ -245,10 +245,14 @@ int PointVersusHalfSpace(const int &Dimen, const float hs[],
         sum = sum + hs[i] * pt.coord[i];
     }
 
-    if (sum > hs[Dimen])
-        return ABOVE;
+    // The absolute difference is considered to avoid approximation errors
+    if (fabs(sum - hs[Dimen]) <= 1e-6)
+        return ON;
     if (sum < hs[Dimen])
+        return ABOVE;
+    if (sum > hs[Dimen])
         return BELOW;
+
     return ON;
 }
 
@@ -275,10 +279,12 @@ int MbrVersusHalfSpace(const int &Dimen, const float hs[], const float mbr[],
         int pos = PointVersusHalfSpace(Dimen, hs, pt);
         if (pos == ABOVE) numAbove++;
         if (pos == BELOW) numBelow++;
+        if (pos == ON) numOn++;
     }
 
-    if (numAbove == numOfVertices) return ABOVE;
-    if (numBelow == numOfVertices) return BELOW;
+    // numOn is summed to account for the halfspaces that lie on one of the leaf sides
+    if (numAbove + numOn == numOfVertices) return ABOVE;
+    if (numBelow + numOn == numOfVertices) return BELOW;
 
     return OVERLAPPED;
 }
