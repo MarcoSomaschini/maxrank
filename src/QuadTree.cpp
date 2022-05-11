@@ -10,6 +10,8 @@
 #include <iterator>
 #include <map>
 
+#include <random>
+
 using namespace std;
 
 struct QuadNode;
@@ -418,8 +420,30 @@ bool QuadTree::GenHammingHalfSpaces(char *OutFileName, const int Dimen, vector<c
             break;
         }
 
+        // The original was using rand(), which has a bad randomness
+        // Also directly generate numbers between 0 and 1
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(0, 1);
+
+        //Discard query points over y = 1 - x (in 3D), as the last parameter (yield by 1 - x - y) would be negative
+        //By doing so eventual mincells in such regions will not be found
+        while(true){
+            for (int i = 0; i < Dimen; i++)
+                InteriorPt[i] = subDataSpace[i] + (subDataSpace[Dimen + i] - subDataSpace[i]) * dis(gen);
+
+            float sum = 0;
+            for (int i = 0; i < Dimen - 1; i++)
+                sum += InteriorPt[i];
+
+            if (InteriorPt[Dimen - 1] < 1 - sum)
+                break;
+        }
+
+        /*
         for (int i = 0; i < Dimen; i++)
             InteriorPt[i] = subDataSpace[i] + (subDataSpace[Dimen + i] - subDataSpace[i]) * (float(rand()) / RAND_MAX);
+        */
 
         int index = 0;
         long int count = 0;
@@ -571,7 +595,7 @@ long int QuadTree::naiveInNodeIntersection(vector<std::pair<long, QuadNode *> > 
         bool isValid = MbrIsValid(Dimen, queryPlane, (*itr).second->MBR, Comb);
         if (!isValid) {
             if (verbose)
-                cout << endl << "Leaf node " << (*itr).second->NodeID << " is pruned!" << endl << endl;
+                cout << endl << "Leaf node " << (*itr).second->NodeID << " is pruned!" << endl;
             NoOfInvalidLeaves++;
             ++itr;
             continue;

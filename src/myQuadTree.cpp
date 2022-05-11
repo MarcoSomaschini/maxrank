@@ -52,7 +52,7 @@ int normalizedMax = 1;
 int numOfSubdivisions = 0;
 float Queryspace[2 * MAXDIM + 1];
 int MaxQuadTreeLevels = 6;
-int QuadNodeCapacity = 25;
+int QuadNodeCapacity = 10; //25;
 bool verbose;
 
 double timeBuildQuadTree = 0;
