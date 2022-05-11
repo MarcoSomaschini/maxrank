@@ -35,11 +35,10 @@
 using namespace std;
 
 
-
 vector<vector<float> > HalfSpaces;  //format: (coeff_1, coeff_2, ..., coeff_d, offset)
 long int NoOfNewlyAddedHalfSpaces;
 long int NoOfTotalHalfspacesAdded;
-map<long int,long int> entriesInLists;
+map<long int, long int> entriesInLists;
 long int NoOfEntriesInLists;
 vector<vector<float> > IncpDB;
 int maximumLevel = 0;
@@ -51,29 +50,28 @@ float memRatioOfQuadTree = 0;
 long numOfNodeSplits = 0;
 int normalizedMax = 1;
 int numOfSubdivisions = 0;
-float Queryspace[2*MAXDIM+1]; 
-int MaxQuadTreeLevels=6;
-int QuadNodeCapacity=25;
-bool verbose; 
+float Queryspace[2 * MAXDIM + 1];
+int MaxQuadTreeLevels = 6;
+int QuadNodeCapacity = 25;
+bool verbose;
 
-double timeBuildQuadTree=0;
-double timeNodeIntersection=0;
+double timeBuildQuadTree = 0;
+double timeNodeIntersection = 0;
 
-long int totalNoOfBitStringsProcessed=0;
-long int totalNoOfPrunedBitStrings=0;
-long int totalNoOfZeroExtentBinStrings=0;
-long int totalNoOfDiscardedCells=0;
+long int totalNoOfBitStringsProcessed = 0;
+long int totalNoOfPrunedBitStrings = 0;
+long int totalNoOfZeroExtentBinStrings = 0;
+long int totalNoOfDiscardedCells = 0;
 
-int tao=0;
+int tao = 0;
 
-bool optWithinNodeIntersection=false;
+bool optWithinNodeIntersection = false;
 
 randomnumber rnd(0);
-int CEILING=1;   //ceiling of the dataspace
+int CEILING = 1;   //ceiling of the dataspace
 
 //code for computing global immutable region by using R-tree index_file
-void helpmsg(const char* pgm)
-{
+void helpmsg(const char *pgm) {
     cout << "Suggested arguments:" << endl;
     cout << "> " << pgm << endl;
     cout << "-p 4096 -d 2 -f raw_data.txt -i index_file.idx -o out.eps -v" << endl;
@@ -95,418 +93,409 @@ void helpmsg(const char* pgm)
     cout << "-v: verbose mode on" << endl;
 }
 
-void myitoa(unsigned long val, char *buf, unsigned radix)
-{
-     char *p;
-     char *firstdig;
-     char temp;
-     unsigned digval;
-     
-     p=buf;
-     firstdig=p;
-     
-     do{
-     	  digval=(unsigned)(val % radix);
-     	  val /= radix;
-     	  
-     	  if (digval > 9)
-     	      *p++ = (char )(digval-10+'a');
-     	  else
-     	      *p++ = (char )(digval+'0');
-     	      
-     }while(val>0);
-     
-     *p--='\0';
-     do{
-     	 temp=*p;
-     	 *p=*firstdig;
-     	 *firstdig=temp;
-     	 --p;
-     	 ++firstdig;
-     }while(firstdig<p);	
+void myitoa(unsigned long val, char *buf, unsigned radix) {
+    char *p;
+    char *firstdig;
+    char temp;
+    unsigned digval;
+
+    p = buf;
+    firstdig = p;
+
+    do {
+        digval = (unsigned) (val % radix);
+        val /= radix;
+
+        if (digval > 9)
+            *p++ = (char) (digval - 10 + 'a');
+        else
+            *p++ = (char) (digval + '0');
+
+    } while (val > 0);
+
+    *p-- = '\0';
+    do {
+        temp = *p;
+        *p = *firstdig;
+        *firstdig = temp;
+        --p;
+        ++firstdig;
+    } while (firstdig < p);
 }
 
-void GenString(long int stringLen, long int HammingDistance, long int currentLen, long int start,vector<char>& hammingStr,multimap<int,vector<char> > &binString)
-{
-     if (currentLen < 0) return;
-     
-     for (long int i=start; i<stringLen; i++)
-     {
-         for (long int j=start; j<i; j++)
-              hammingStr.push_back('0');
-         hammingStr.push_back('1');
-         GenString(stringLen,HammingDistance,currentLen-1,i+1,hammingStr,binString);
-         if (currentLen == 0)
-         {
-             for (long int j=i+1; j<stringLen; j++)
-                  hammingStr.push_back('0');
-             
-             vector<char> tmpHammingStr=hammingStr;     
-             typedef multimap<int,vector<char> >::value_type VT;
-             binString.insert(VT(HammingDistance,tmpHammingStr));
-             
-             //cout << "Generated Hamming string: " << string(tmpHammingStr.begin(),tmpHammingStr.end()) << endl;
-                  
-             for (long int j=i+1; j<stringLen; j++)
-                  hammingStr.pop_back();             
-         }
-         hammingStr.pop_back();     
-         for (long int j=start; j<i; j++)
-              hammingStr.pop_back();                                
-     }
+void
+GenString(long int stringLen, long int HammingDistance, long int currentLen, long int start, vector<char> &hammingStr,
+          multimap<int, vector<char> > &binString) {
+    if (currentLen < 0) return;
+
+    for (long int i = start; i < stringLen; i++) {
+        for (long int j = start; j < i; j++)
+            hammingStr.push_back('0');
+        hammingStr.push_back('1');
+        GenString(stringLen, HammingDistance, currentLen - 1, i + 1, hammingStr, binString);
+        if (currentLen == 0) {
+            for (long int j = i + 1; j < stringLen; j++)
+                hammingStr.push_back('0');
+
+            vector<char> tmpHammingStr = hammingStr;
+            typedef multimap<int, vector<char> >::value_type VT;
+            binString.insert(VT(HammingDistance, tmpHammingStr));
+
+            //cout << "Generated Hamming string: " << string(tmpHammingStr.begin(),tmpHammingStr.end()) << endl;
+
+            for (long int j = i + 1; j < stringLen; j++)
+                hammingStr.pop_back();
+        }
+        hammingStr.pop_back();
+        for (long int j = start; j < i; j++)
+            hammingStr.pop_back();
+    }
 }
 
-void GenLenNBinaryString(long int len1, long int HammingDistance, multimap<int,vector<char> > &binString)
-{
-     vector<char> hammingStr;
-     
-     if (HammingDistance == 0) 
-     {
-         for (long int i=0; i<len1; i++) hammingStr.push_back('0');
-         typedef multimap<int,vector<char> >::value_type VT;
-         binString.insert(VT(0,hammingStr));
-         return;
-     }
+void GenLenNBinaryString(long int len1, long int HammingDistance, multimap<int, vector<char> > &binString) {
+    vector<char> hammingStr;
 
-     if (HammingDistance == 1) 
-     {
-         for (long int i=0; i<len1; i++) 
-         {         
-             hammingStr.clear();
-             for (long int j=0; j<i; j++)              
-                  hammingStr.push_back('0');            
-             hammingStr.push_back('1');            
-             for (long int j=i+1; j<len1; j++)              
-                  hammingStr.push_back('0');                  
+    if (HammingDistance == 0) {
+        for (long int i = 0; i < len1; i++) hammingStr.push_back('0');
+        typedef multimap<int, vector<char> >::value_type VT;
+        binString.insert(VT(0, hammingStr));
+        return;
+    }
 
-             typedef multimap<int,vector<char> >::value_type VT;
-             binString.insert(VT(1,hammingStr));
-         }
-         return;
-     }
-     
-     
-     GenString(len1,HammingDistance,HammingDistance-1,0,hammingStr,binString);
-          
-     return;
+    if (HammingDistance == 1) {
+        for (long int i = 0; i < len1; i++) {
+            hammingStr.clear();
+            for (long int j = 0; j < i; j++)
+                hammingStr.push_back('0');
+            hammingStr.push_back('1');
+            for (long int j = i + 1; j < len1; j++)
+                hammingStr.push_back('0');
+
+            typedef multimap<int, vector<char> >::value_type VT;
+            binString.insert(VT(1, hammingStr));
+        }
+        return;
+    }
+
+
+    GenString(len1, HammingDistance, HammingDistance - 1, 0, hammingStr, binString);
+
+    return;
 }
 
 
-void GenBinaryString(long int len1,long int Max,multimap<int,vector<char> > &binString)
-{
-     //ofstream fOut;
-     //fOut.open("CombSubspace.txt", ios::app);
+void GenBinaryString(long int len1, long int Max, multimap<int, vector<char> > &binString) {
+    //ofstream fOut;
+    //fOut.open("CombSubspace.txt", ios::app);
 
-     typedef multimap<int,vector<char> >::value_type VT;
+    typedef multimap<int, vector<char> >::value_type VT;
 
-     binString.clear();
-     
-     char str[128],*b;	 
-     //int len1=int(log(Max)/log(2));
-     for (int i=0;i<Max;i++)
-     {
-         myitoa(i,str,2);
-         int len=len1-strlen(str);         
-         b = new char[Max+1];
-         strcpy(b,"");
-         for(int j=1;j<=len;j++) strcat(b,"0");
-         strcat(b,str);
-         cout << "i= " << i << ", binary string: " << b << endl;
-         //fOut << b << endl;
+    binString.clear();
 
-		 //count the number of '1's
-		 vector<char> tmpVec;
-		 int NoOfOnes = 0;
-		 for (int j=0;j<strlen(b);j++)
-		 {
-                      if (b[j] == '1') NoOfOnes++;
-                      tmpVec.push_back(b[j]);
-                 }
-		 binString.insert(VT(NoOfOnes,tmpVec));
-		 
-         delete b;
-     }
-     //fOut.close();
-           	
-     return;
+    char str[128], *b;
+    //int len1=int(log(Max)/log(2));
+    for (int i = 0; i < Max; i++) {
+        myitoa(i, str, 2);
+        int len = len1 - strlen(str);
+        b = new char[Max + 1];
+        strcpy(b, "");
+        for (int j = 1; j <= len; j++) strcat(b, "0");
+        strcat(b, str);
+        cout << "i= " << i << ", binary string: " << b << endl;
+        //fOut << b << endl;
+
+        //count the number of '1's
+        vector<char> tmpVec;
+        int NoOfOnes = 0;
+        for (int j = 0; j < strlen(b); j++) {
+            if (b[j] == '1') NoOfOnes++;
+            tmpVec.push_back(b[j]);
+        }
+        binString.insert(VT(NoOfOnes, tmpVec));
+
+        delete b;
+    }
+    //fOut.close();
+
+    return;
 }
 
-bool PointCoveredByMBR(const int &Dimen, const float mbr[], const Point1 &pt){
+bool PointCoveredByMBR(const int &Dimen, const float mbr[], const Point1 &pt) {
 
-	bool isCovered = true;
-	
-	for (int i=0;i<Dimen; i++){
-		if ( (pt.coord[i] <= mbr[i]) || (pt.coord[i] >= mbr[Dimen+i]) ){
-			isCovered = false;
-			break;
-		}
-	}
+    bool isCovered = true;
 
-	return isCovered;
+    for (int i = 0; i < Dimen; i++) {
+        if ((pt.coord[i] <= mbr[i]) || (pt.coord[i] >= mbr[Dimen + i])) {
+            isCovered = false;
+            break;
+        }
+    }
+
+    return isCovered;
 };
 
-int PointVersusHalfSpace(const int &Dimen, const float hs[], const Point1 &pt){   //position of a point to a halfspace: is the point above, below, or on the halfspace?
+int PointVersusHalfSpace(const int &Dimen, const float hs[],
+                         const Point1 &pt) {   //position of a point to a halfspace: is the point above, below, or on the halfspace?
 
     bool isAbove = false;
 
-	float sum = 0;
+    float sum = 0;
 
-	for (int i=0; i<Dimen; i++){
-		 sum = sum + hs[i]*pt.coord[i];
-	}
+    for (int i = 0; i < Dimen; i++) {
+        sum = sum + hs[i] * pt.coord[i];
+    }
 
-	if (sum > hs[Dimen]) 
-		return ABOVE;
-	if (sum < hs[Dimen]) 
-		return BELOW;
-	return ON;
+    if (sum > hs[Dimen])
+        return ABOVE;
+    if (sum < hs[Dimen])
+        return BELOW;
+    return ON;
 }
 
-int MbrVersusHalfSpace(const int &Dimen, const float hs[], const float mbr[], vector<string> &Comb){   //position of an MBR to a halfspace: is the point above, below, or intersected by the halfspace?
+int MbrVersusHalfSpace(const int &Dimen, const float hs[], const float mbr[],
+                       vector<string> &Comb) {   //position of an MBR to a halfspace: is the point above, below, or intersected by the halfspace?
 
-	int numAbove=0;
-	int numBelow=0;
-	int numOn=0;
+    int numAbove = 0;
+    int numBelow = 0;
+    int numOn = 0;
 
-	long int numOfVertices = 0;
-	numOfVertices=Comb.size();	
+    long int numOfVertices = 0;
+    numOfVertices = Comb.size();
 
-	for (int i=0; i < numOfVertices; i++){
-		 Point1 pt;
+    for (int i = 0; i < numOfVertices; i++) {
+        Point1 pt;
 
-		 long int numOfDimen = Comb[i].size();
-		 for (int j=0; j< numOfDimen; j++){
-              if (Comb[i][j] == '0') 
-				  pt.coord[j] = mbr[j];
-			  if (Comb[i][j] == '1') 
-				  pt.coord[j] = mbr[Dimen+j];
-		 }
-         int pos=PointVersusHalfSpace(Dimen, hs, pt);
-		 if (pos == ABOVE) numAbove++;
-		 if (pos == BELOW) numBelow++;
-	}
+        long int numOfDimen = Comb[i].size();
+        for (int j = 0; j < numOfDimen; j++) {
+            if (Comb[i][j] == '0')
+                pt.coord[j] = mbr[j];
+            if (Comb[i][j] == '1')
+                pt.coord[j] = mbr[Dimen + j];
+        }
+        int pos = PointVersusHalfSpace(Dimen, hs, pt);
+        if (pos == ABOVE) numAbove++;
+        if (pos == BELOW) numBelow++;
+    }
 
-	if (numAbove == numOfVertices) return ABOVE;
+    if (numAbove == numOfVertices) return ABOVE;
     if (numBelow == numOfVertices) return BELOW;
 
     return OVERLAPPED;
 }
 
-bool MbrIsValid(const int &Dimen, const float hs[], const float mbr[], vector<string> &Comb){   //position of an MBR to a halfspace: is the point above, below, or intersected by the halfspace?
-  
-	int numAbove=0;
-	int numBelow=0;
-	int numOn=0;
+bool MbrIsValid(const int &Dimen, const float hs[], const float mbr[],
+                vector<string> &Comb) {   //position of an MBR to a halfspace: is the point above, below, or intersected by the halfspace?
 
-	long int numOfVertices = 0;
-	numOfVertices=Comb.size();	
+    int numAbove = 0;
+    int numBelow = 0;
+    int numOn = 0;
 
-	for (int i=0; i < numOfVertices; i++){
-		 Point1 pt;
+    long int numOfVertices = 0;
+    numOfVertices = Comb.size();
 
-		 long int numOfDimen = Comb[i].size();
-		 for (int j=0; j< numOfDimen; j++){
-              if (Comb[i][j] == '0') 
-				  pt.coord[j] = mbr[j];
-			  if (Comb[i][j] == '1') 
-				  pt.coord[j] = mbr[Dimen+j];
-		 }
-		 float sum = 0;
-		 for (int k = 0; k < numOfDimen; k++) sum = sum + pt.coord[k];
-		 if (sum > hs[Dimen]) numAbove++;
-		 if (sum < hs[Dimen]) numBelow++;
-	}
+    for (int i = 0; i < numOfVertices; i++) {
+        Point1 pt;
 
-	if (numAbove == numOfVertices) return false;
+        long int numOfDimen = Comb[i].size();
+        for (int j = 0; j < numOfDimen; j++) {
+            if (Comb[i][j] == '0')
+                pt.coord[j] = mbr[j];
+            if (Comb[i][j] == '1')
+                pt.coord[j] = mbr[Dimen + j];
+        }
+        float sum = 0;
+        for (int k = 0; k < numOfDimen; k++) sum = sum + pt.coord[k];
+        if (sum > hs[Dimen]) numAbove++;
+        if (sum < hs[Dimen]) numBelow++;
+    }
+
+    if (numAbove == numOfVertices) return false;
     if (numBelow == numOfVertices) return true;
 
 }
 
-int readHalfSpaces(const char *FileName, const int &Dimen){
+int readHalfSpaces(const char *FileName, const int &Dimen) {
 
     FILE *fp;
-	char *token;
-	char m_separator[] = " \n\t";
-	char buf[512];	
-	long int numOfHalfSpaces = 0;	
-	int DimenOfHalfSpace;
+    char *token;
+    char m_separator[] = " \n\t";
+    char buf[512];
+    long int numOfHalfSpaces = 0;
+    int DimenOfHalfSpace;
 
-	float Min[MAXDIM];
-	float Max[MAXDIM];
-	std::fill(Min,Min+MAXDIM,999999);
-    std::fill(Max,Max+MAXDIM,-999999);
+    float Min[MAXDIM];
+    float Max[MAXDIM];
+    std::fill(Min, Min + MAXDIM, 999999);
+    std::fill(Max, Max + MAXDIM, -999999);
 
-	fp = fopen(FileName,"r");
-	if (fp == NULL) {
+    fp = fopen(FileName, "r");
+    if (fp == NULL) {
         cout << "error in file opening!" << endl;
-		exit(0);
-	}
-	
-	while (fgets(buf,512,fp) != NULL){
-        token = strtok(buf,m_separator);
-		vector<float> hs;                      //a single halfspace
-		numOfHalfSpaces++;
-		DimenOfHalfSpace = 0;
-		while (token != NULL){
-			float tmp = atof(token);
-			hs.push_back(tmp);
-			if (Min[DimenOfHalfSpace]>tmp) Min[DimenOfHalfSpace] = tmp;
-			if (Max[DimenOfHalfSpace]<tmp) Max[DimenOfHalfSpace] = tmp;
-			DimenOfHalfSpace++;
-			token = strtok(NULL,m_separator);
-		}
-		HalfSpaces.push_back(hs);
-		if (DimenOfHalfSpace != Dimen+1){
-			cout << "Caution!! The dimensionality of halfspaces is not equal! Halfspace ID = " << endl;
-		}
-	}
+        exit(0);
+    }
+
+    while (fgets(buf, 512, fp) != NULL) {
+        token = strtok(buf, m_separator);
+        vector<float> hs;                      //a single halfspace
+        numOfHalfSpaces++;
+        DimenOfHalfSpace = 0;
+        while (token != NULL) {
+            float tmp = atof(token);
+            hs.push_back(tmp);
+            if (Min[DimenOfHalfSpace] > tmp) Min[DimenOfHalfSpace] = tmp;
+            if (Max[DimenOfHalfSpace] < tmp) Max[DimenOfHalfSpace] = tmp;
+            DimenOfHalfSpace++;
+            token = strtok(NULL, m_separator);
+        }
+        HalfSpaces.push_back(hs);
+        if (DimenOfHalfSpace != Dimen + 1) {
+            cout << "Caution!! The dimensionality of halfspaces is not equal! Halfspace ID = " << endl;
+        }
+    }
     fclose(fp);
 
-	//normalize halfspaces
-	int OutterSz = HalfSpaces.size();
-	int InnerSz = HalfSpaces[0].size();
-	for (int i = 0; i < InnerSz; i++)
-	{
-		 float min = Min[i];
-		 float max = Max[i];
-		 for (int j = 0; j < OutterSz; j++)
-			 HalfSpaces[j][i] = (HalfSpaces[j][i] - min)/(max - min);
-	}
-	//end of normalize halfspaces
+    //normalize halfspaces
+    int OutterSz = HalfSpaces.size();
+    int InnerSz = HalfSpaces[0].size();
+    for (int i = 0; i < InnerSz; i++) {
+        float min = Min[i];
+        float max = Max[i];
+        for (int j = 0; j < OutterSz; j++)
+            HalfSpaces[j][i] = (HalfSpaces[j][i] - min) / (max - min);
+    }
+    //end of normalize halfspaces
 
-	cout << numOfHalfSpaces << " halfspaces have been read!" << endl;
+    cout << numOfHalfSpaces << " halfspaces have been read!" << endl;
 
-	return 0;
+    return 0;
 }
 
-int buildHalfSpaces(const char *FileName, const int &Dimen, const Point1 &p){    //read in the incomparable records, i.e., those not dominate or dominated by query record p
+int buildHalfSpaces(const char *FileName, const int &Dimen,
+                    const Point1 &p) {    //read in the incomparable records, i.e., those not dominate or dominated by query record p
 
-        FILE *fp;
-	char *token;
-	char m_separator[] = " \n\t";
-	char buf[512];	
-	long int numOfRds = 0, numOfIncpRds = 0;	
-	int DimenOfRs;
+    FILE *fp;
+    char *token;
+    char m_separator[] = " \n\t";
+    char buf[512];
+    long int numOfRds = 0, numOfIncpRds = 0;
+    int DimenOfRs;
 
-	fp = fopen(FileName,"r");
-	if (fp == NULL) {
+    fp = fopen(FileName, "r");
+    if (fp == NULL) {
         cout << "error in opening database file!" << endl;
-		exit(0);
-	}
-	
-	IncpDB.clear();
-	while (fgets(buf,512,fp) != NULL){
-        token = strtok(buf,m_separator);
-		vector<float> Rd;                      //a single halfspace
-		DimenOfRs = 0;
-		while (token != NULL){
-			Rd.push_back(atof(token));
-			DimenOfRs++;
-			token = strtok(NULL,m_separator);
-		}		
-		if (DimenOfRs != Dimen){
-			cout << "Caution!! The dimensionality of records is not equal! Record ID = " << endl;
-		}
-		numOfRds++;
+        exit(0);
+    }
 
-                /*
-		//check whether p is dominated by current record
-		int dominate = 0;
-		for (int i=0; i<Dimen; i++)
-			 if (p.coord[i]>=Rd[i]) dominate++;			 
-                if (dominate >= Dimen) continue;     //current record is dominated by p, so we discard it
-		
-		//check whether p dominates current record
-		int isDominatedBy = 0;
-		for (int i=0; i<Dimen; i++)
-			 if (p.coord[i]<=Rd[i]) isDominatedBy++;			 
-                if (isDominatedBy >= Dimen) continue;     //current record dominates p, so we discard it too
-                //*/
+    IncpDB.clear();
+    while (fgets(buf, 512, fp) != NULL) {
+        token = strtok(buf, m_separator);
+        vector<float> Rd;                      //a single halfspace
+        DimenOfRs = 0;
+        while (token != NULL) {
+            Rd.push_back(atof(token));
+            DimenOfRs++;
+            token = strtok(NULL, m_separator);
+        }
+        if (DimenOfRs != Dimen) {
+            cout << "Caution!! The dimensionality of records is not equal! Record ID = " << endl;
+        }
+        numOfRds++;
 
-		IncpDB.push_back(Rd);    //found an incomparable record
-		numOfIncpRds++;
-		vector<float> tmpHS;     
-		float Rd_d = Rd[Dimen-1];
-		float p_d = p.coord[Dimen-1];
-		for (int i=0; i<Dimen-1; i++){
-			 tmpHS.push_back((Rd[i]-Rd_d-p.coord[i]+p_d));
-		}
-		tmpHS.push_back(p_d-Rd_d);
-		tmpHS.push_back(numOfRds);            //store the ID of incomparable record in HalfSpace
-		HalfSpaces.push_back(tmpHS);          //form the half-space defined by the incomparable record and p		
-	}
-        fclose(fp);
+        /*
+//check whether p is dominated by current record
+int dominate = 0;
+for (int i=0; i<Dimen; i++)
+     if (p.coord[i]>=Rd[i]) dominate++;
+        if (dominate >= Dimen) continue;     //current record is dominated by p, so we discard it
 
-	//cout << numOfIncpRds << " Incomparable records have been found in " << numOfRds << " records." << endl;
-	cout << numOfIncpRds << " half-spaces have been constructed from skylines!"<< endl;
+//check whether p dominates current record
+int isDominatedBy = 0;
+for (int i=0; i<Dimen; i++)
+     if (p.coord[i]<=Rd[i]) isDominatedBy++;
+        if (isDominatedBy >= Dimen) continue;     //current record dominates p, so we discard it too
+        //*/
 
-	return 0;
+        IncpDB.push_back(Rd);    //found an incomparable record
+        numOfIncpRds++;
+        vector<float> tmpHS;
+        float Rd_d = Rd[Dimen - 1];
+        float p_d = p.coord[Dimen - 1];
+        for (int i = 0; i < Dimen - 1; i++) {
+            tmpHS.push_back((Rd[i] - Rd_d - p.coord[i] + p_d));
+        }
+        tmpHS.push_back(p_d - Rd_d);
+        tmpHS.push_back(numOfRds);            //store the ID of incomparable record in HalfSpace
+        HalfSpaces.push_back(tmpHS);          //form the half-space defined by the incomparable record and p
+    }
+    fclose(fp);
+
+    //cout << numOfIncpRds << " Incomparable records have been found in " << numOfRds << " records." << endl;
+    cout << numOfIncpRds << " half-spaces have been constructed from skylines!" << endl;
+
+    return 0;
 }
 
-void findTopKfromDB(float* PG[], long int objcnt, int Dimen, int* pos)
-{
-     long int i;
-     
-     //ofstream fout;
-     //fout.open("testOut.txt",ios::out);
-     
-     double point[MAXDIM];
-     
-     map<float, long int, greater<float> > Records;
-     map<float, long int, greater<float> >::iterator mItr;
-     typedef map<float, long int, greater<float> >::value_type mVT;
-     
+void findTopKfromDB(float *PG[], long int objcnt, int Dimen, int *pos) {
+    long int i;
 
-     for (i=0;i<objcnt;i++)
-     {
+    //ofstream fout;
+    //fout.open("testOut.txt",ios::out);
+
+    double point[MAXDIM];
+
+    map<float, long int, greater<float> > Records;
+    map<float, long int, greater<float> >::iterator mItr;
+    typedef map<float, long int, greater<float> >::value_type mVT;
+
+
+    for (i = 0; i < objcnt; i++) {
+        float score = 0;
+        for (int j = 0; j < Dimen; j++)
+            score = score + (PG[i + 1][j] + PG[i + 1][Dimen + j]) / 2.0;
+        Records.insert(mVT(score, (i + 1)));
+    }
+
+    /*
+    fstream fin;
+    fin.open(dbFile,ios::in);
+    while (true)
+    {
+        fin >> id;
+        if (fin.eof()) break;
+
         float score=0;
-        for (int j=0;j<Dimen;j++)
-           score=score+(PG[i+1][j]+PG[i+1][Dimen+j])/2.0;
-        Records.insert(mVT(score,(i+1)));   
-     }
-     
-     /*
-     fstream fin;
-     fin.open(dbFile,ios::in);
-     while (true)
-     {
-         fin >> id;
-         if (fin.eof()) break;
-         
-         float score=0;
-         for (i=0;i<Dimen;i++)
-         {
-              fin >> point[i];
-              score=score+point[i];
-         }
-         Records.insert(mVT(score,id));
-     }
-     fin.close();
-     //*/
-     
-     long int counter=0;
-     int idx=0;
-     for (mItr=Records.begin();mItr!=Records.end();mItr++)
-     { 
-          //fout << "ID=" << mItr->first << ", score="<< mItr->second << endl;
-          
-          counter++;
-          switch (counter)
-          {
-              case 5:
-              case 10:
-              case 50:
-              case 100:
-              case 500:
-              case 1000: pos[idx]=mItr->second;
-                         idx++;                         
-          }     
-     }
-     //fout.close();
-     return;     
+        for (i=0;i<Dimen;i++)
+        {
+             fin >> point[i];
+             score=score+point[i];
+        }
+        Records.insert(mVT(score,id));
+    }
+    fin.close();
+    //*/
+
+    long int counter = 0;
+    int idx = 0;
+    for (mItr = Records.begin(); mItr != Records.end(); mItr++) {
+        //fout << "ID=" << mItr->first << ", score="<< mItr->second << endl;
+
+        counter++;
+        switch (counter) {
+            case 5:
+            case 10:
+            case 50:
+            case 100:
+            case 500:
+            case 1000:
+                pos[idx] = mItr->second;
+                idx++;
+        }
+    }
+    //fout.close();
+    return;
 }
 
-int main(const int a_argc, const char** a_argv) {
+int main(const int a_argc, const char **a_argv) {
     if (a_argc == 1) {
         helpmsg(a_argv[0]);
         return -1;
@@ -948,8 +937,7 @@ int main(const int a_argc, const char** a_argv) {
             if (finMem.eof()) break;
             cout << line << endl;
         }
-    }
-    else {
+    } else {
         printf("Couldn't retrieve memory info!\n");
     }
     finMem.close();
@@ -962,12 +950,11 @@ int main(const int a_argc, const char** a_argv) {
             if (finMem.eof()) break;
             cout << line << endl;
         }
-    }
-    else {
+    } else {
         printf("Couldn't retrieve process info!\n");
     }
     finMem.close();
- 
+
     return 0;
 }
 

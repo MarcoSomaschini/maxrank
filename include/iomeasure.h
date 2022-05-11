@@ -7,12 +7,11 @@
 
 #include "collection.h"
 
-class IOMeasure
-{
+class IOMeasure {
 public:
     static int lru(                     // measure the I/O based on initially 
-        const Array& a_pageaccessed,    // empty LRU cache
-        const int a_cachesize);
+            const Array &a_pageaccessed,    // empty LRU cache
+            const int a_cachesize);
 };
 
 #endif

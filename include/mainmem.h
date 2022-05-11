@@ -9,27 +9,31 @@
 #include "mem.h"
 #include "collection.h"
 
-class MainMemory: public Memory
-{
+class MainMemory : public Memory {
 // data members
 public:
-    Hash    m_buffer;       // content of pages
-    Queue   m_avail;
-    int     m_largest;      // largest page ID available to allocate so far.
+    Hash m_buffer;       // content of pages
+    Queue m_avail;
+    int m_largest;      // largest page ID available to allocate so far.
 // methods
 public:
     // constructor/destructor
     MainMemory(const int a_pagesize);
+
     virtual ~MainMemory();
+
     // search
-    virtual RtreeNode* loadPage(    // read a node (page) from main memory
-        const int a_pageID);
+    virtual RtreeNode *loadPage(    // read a node (page) from main memory
+            const int a_pageID);
+
     // update
     virtual int allocatePage();     // obtain ID of an unused page
     virtual void writePage(         // write a page to main memory
-        const int a_pageID, const RtreeNode* m_p);
+            const int a_pageID, const RtreeNode *m_p);
+
     virtual void removePage(        // remove a page from main memory
-        const int a_pageID);
+            const int a_pageID);
+
     virtual void flush();           // clean the memory
 };
 

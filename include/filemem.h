@@ -28,38 +28,43 @@ class RtreeNodeEntry;
 
 using namespace std;
 
-class FileMemory: public Memory
-{
+class FileMemory : public Memory {
 // data members
 public:
-    fstream     m_memfile;      // content of pages
-    int         m_freelist;     // free list header pointer
-    int         m_largest;
-    char*       m_buffer;
-    RtreeNodeEntry* (*m_fromMem)(            // to convert a bytestring to a 
-        const char* a_p, int& a_len,    // RtreeNodeEntry
-        const int a_dimen,
-        const bool a_pt);
+    fstream m_memfile;      // content of pages
+    int m_freelist;     // free list header pointer
+    int m_largest;
+    char *m_buffer;
+
+    RtreeNodeEntry *(*m_fromMem)(            // to convert a bytestring to a
+            const char *a_p, int &a_len,    // RtreeNodeEntry
+            const int a_dimen,
+            const bool a_pt);
 
 // methods
 public:
     // constructor/destructor
     FileMemory(
-        const int a_pagesize, const char* filename,
-        RtreeNodeEntry* (*a_fromMem)(
-            const char* a_mem, int& a_len,
-            const int a_dimen, const bool a_pt),
-        const bool a_new=false);
+            const int a_pagesize, const char *filename,
+            RtreeNodeEntry *(*a_fromMem)(
+                    const char *a_mem, int &a_len,
+                    const int a_dimen, const bool a_pt),
+            const bool a_new = false);
+
     virtual ~FileMemory();
+
     // search
-    virtual RtreeNode* loadPage(    // read a node (page) from a file
-        const int a_pageID);
+    virtual RtreeNode *loadPage(    // read a node (page) from a file
+            const int a_pageID);
+
     // update
     virtual int allocatePage();     // obtain ID of an unused page
     virtual void writePage(         // write a page to a file
-        const int a_pageID, const RtreeNode* m_p);
+            const int a_pageID, const RtreeNode *m_p);
+
     virtual void removePage(        // remove a page from a file
-        const int a_pageID);
+            const int a_pageID);
+
     virtual void flush();           // clean the memory
 };
 

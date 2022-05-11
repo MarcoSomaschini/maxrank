@@ -17,24 +17,26 @@
 #define TGS_DEFINED
 
 class Memory;
+
 class Rtree;
+
 class RtreeNode;
+
 class RtreeNodeEntry;
 
-class TGS
-{
+class TGS {
 public:
-    static Rtree* bulkload(     // bulk load a set of entires and form a Rtree
-        Memory& a_memory,
-        const int a_dimen,
-        const int a_maxNodeFill, const int a_maxLeafFill,
-        const int a_minNodeFill, const int a_minLeafFill,
-        RtreeNodeEntry** a_p, int a_numEntry,
-        const bool a_pointOnly=false);
+    static Rtree *bulkload(     // bulk load a set of entires and form a Rtree
+            Memory &a_memory,
+            const int a_dimen,
+            const int a_maxNodeFill, const int a_maxLeafFill,
+            const int a_minNodeFill, const int a_minLeafFill,
+            RtreeNodeEntry **a_p, int a_numEntry,
+            const bool a_pointOnly = false);
 
-    static int partition(Rtree& a_rtree,
-              RtreeNodeEntry** a_p, const int a_numEntry,
-              const int a_level, Array& a);        
+    static int partition(Rtree &a_rtree,
+                         RtreeNodeEntry **a_p, const int a_numEntry,
+                         const int a_level, Array &a);
 };
 
 #endif // TGS_DEFINED

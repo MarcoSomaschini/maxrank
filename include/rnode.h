@@ -9,7 +9,8 @@
 #ifndef RTREENODE_DEFINED
 #define RTREENODE_DEFINED
 
-class Rtree; 
+class Rtree;
+
 class RtreeNodeEntry;
 
 //class virtualRnode;
@@ -19,54 +20,65 @@ class RtreeNodeEntry;
 #define NODE_OVERFLOW   10002   // value for node overflow
 #define NODE_UNDERFULL  10003   // value for node underfull
 
-class RtreeNode
-{
+class RtreeNode {
 // data members
 public:
-    const Rtree*        m_rtree;        // references to Rtree
-    int                 m_pageid;       // page ID of the node
-    int                 m_level;        // level in the tree (0: leaf)
-    int                 m_parent;       // page ID of its parent node
-    int                 m_usedSpace;    // number of entries
-    RtreeNodeEntry**    m_entry;        // an array of entries
+    const Rtree *m_rtree;        // references to Rtree
+    int m_pageid;       // page ID of the node
+    int m_level;        // level in the tree (0: leaf)
+    int m_parent;       // page ID of its parent node
+    int m_usedSpace;    // number of entries
+    RtreeNodeEntry **m_entry;        // an array of entries
 // methods
 public:
     // constructor/destructor
     RtreeNode(
-        const Rtree* a_rtree,
-        const int a_pageid,
-        const int a_level=0, const int a_parent=-1);
-        
+            const Rtree *a_rtree,
+            const int a_pageid,
+            const int a_level = 0, const int a_parent = -1);
+
     RtreeNode(                    //my code 
-        const int a_pageid,
-        const int a_level=0, const int a_parent=-1);
-        
+            const int a_pageid,
+            const int a_level = 0, const int a_parent = -1);
+
     virtual ~RtreeNode();
-    virtual RtreeNode* clone() const;
+
+    virtual RtreeNode *clone() const;
+
     //
     // search
     virtual bool isRoot() const;
+
     virtual bool isLeaf() const;
-    virtual RtreeNodeEntry* genNodeEntry() const;
+
+    virtual RtreeNodeEntry *genNodeEntry() const;
+
     //
     // update
-    virtual int insert(const RtreeNodeEntry& a_entry);
-    
+    virtual int insert(const RtreeNodeEntry &a_entry);
+
     //virtual int insert(const RtreeNodeEntry& a_entry, int flag);    //my code
-    
-    virtual void quadraticSplit(RtreeNode** a_p0, RtreeNode** a_p1);
-    virtual void goodnessSplit(RtreeNode** a_p0, RtreeNode** a_p1);
-    virtual void pickWorst(const int a_reinsert, RtreeNode** a_remainNode, RtreeNodeEntry** a_pRemove);
-    virtual int replace(const RtreeNodeEntry& a_entry);
-    virtual int remove(const RtreeNodeEntry& a_entry);
+
+    virtual void quadraticSplit(RtreeNode **a_p0, RtreeNode **a_p1);
+
+    virtual void goodnessSplit(RtreeNode **a_p0, RtreeNode **a_p1);
+
+    virtual void pickWorst(const int a_reinsert, RtreeNode **a_remainNode, RtreeNodeEntry **a_pRemove);
+
+    virtual int replace(const RtreeNodeEntry &a_entry);
+
+    virtual int remove(const RtreeNodeEntry &a_entry);
+
     // memory operations
-    virtual int toMem(char* a_content, int& a_len) const;
-    static RtreeNode* fromMem(
-        const char* a_p, int& a_len,
-        const Rtree* a_rtree,
-        RtreeNodeEntry* (*fromMem)(
-            const char* a_mem, int& a_len,
-            const int a_dimen, const bool a_pt));
+    virtual int toMem(char *a_content, int &a_len) const;
+
+    static RtreeNode *fromMem(
+            const char *a_p, int &a_len,
+            const Rtree *a_rtree,
+            RtreeNodeEntry *(*fromMem)(
+                    const char *a_mem, int &a_len,
+                    const int a_dimen, const bool a_pt));
+
     // info
     static int size();
 };

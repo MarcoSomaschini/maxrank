@@ -8,19 +8,19 @@
 
 using namespace std;
 
-class Query
-{
+class Query {
 public:
-        Query();
-        ~Query();   
-           
-	int id;
-	int k;
-	int affected;
-	double IR;
-	multimap <float,int> score;
-	float function[DMAX];
+    Query();
 
-	void initQuery(int i, int n, float *c, int D);
+    ~Query();
+
+    int id;
+    int k;
+    int affected;
+    double IR;
+    multimap<float, int> score;
+    float function[DMAX];
+
+    void initQuery(int i, int n, float *c, int D);
 };
 

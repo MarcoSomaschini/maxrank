@@ -6,13 +6,12 @@
 #ifndef PARAM_DEFINED
 #define PARAM_DEFINED
 
-class Param
-{
+class Param {
 public:
-    static const char* read(
-        const int a_argc, const char** a_argv,  // arguments
-        const char* a_param,    // param flag e.g. "-i"
-        const char* a_def);     // default value if the flag is not found
+    static const char *read(
+            const int a_argc, const char **a_argv,  // arguments
+            const char *a_param,    // param flag e.g. "-i"
+            const char *a_def);     // default value if the flag is not found
 };
 
 #endif // PARAM_DEFINED

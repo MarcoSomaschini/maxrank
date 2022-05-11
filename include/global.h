@@ -11,7 +11,7 @@
 //randomnumber rnd(7486587);
 
 #ifndef _Globals
-#define DMAX 10	//max dimensionality
+#define DMAX 10    //max dimensionality
 #define MAXPAGEID 4999999
 #define _Globals
 #define SIDELEN 0.002
