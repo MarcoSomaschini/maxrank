@@ -2,5 +2,6 @@
 cmake-build-debug
 # Temporary files
 tmp/*
+!tmp/.gitkeep
 # Output file
 bin/myout.txt
