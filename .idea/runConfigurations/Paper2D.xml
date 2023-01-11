@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Paper2D" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-p 4096 -d 2 -i ../tmp/idx -f ../examples/Paper2D/data.txt -q ../examples/Paper2D/query.txt -r 6 -m BA -h 7 -t 0 -o 0 -v" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://../bin" PASS_PARENT_ENVS_2="true" PROJECT_NAME="maxrank" TARGET_NAME="myQuadTree" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="maxrank" RUN_TARGET_NAME="myQuadTree">
-    <method v="2">
-      <option name="CMake.Explicit.Target" explicitTargetName="clean" />
-      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-    </method>
-  </configuration>
-</component>

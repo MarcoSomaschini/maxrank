@@ -570,7 +570,7 @@ long int QuadTree::naiveInNodeIntersection(vector<std::pair<long, QuadNode *> > 
     strcat(volumeFilename, Buf);
     strcat(volumeFilename, "D.txt");
 
-    char namePrefix[] = "../tmp/HalfSpaces";
+    char namePrefix[] = "tmp/HalfSpaces";
     char nameSuffix[] = ".txt";
     char halfspaceFileName[1024];
 
@@ -714,10 +714,10 @@ long int QuadTree::naiveInNodeIntersection(vector<std::pair<long, QuadNode *> > 
                     }
 
                     //perform intersection for all the halfspaces inside the set 'intersected halfspaces' of a leaf node
-                    char sys_string[4096] = "qhalf Fp < ";
+                    char sys_string[4096] = "bin\\qhalf Fp < ";
                     strcat(sys_string, halfspaceFileName);
 
-                    strcat(sys_string, " | qconvex FA > ");
+                    strcat(sys_string, " | bin\\qconvex FA > ");
                     strcat(sys_string, volumeFilename);
                     system(sys_string);
                     if (verbose)
@@ -1054,9 +1054,9 @@ long int QuadTree::optimizedInNodeIntersection(vector<std::pair<long, QuadNode *
                     }
 
                     //perform intersection for all the halfspaces inside the set 'intersected halfspaces' of a leaf node
-                    char sys_string[4096] = "./qhalf Fp < ";
+                    char sys_string[4096] = "bin\\qhalf Fp < ";
                     strcat(sys_string, halfspaceFileName);
-                    strcat(sys_string, " | ./qconvex FA > ");
+                    strcat(sys_string, " | bin\\qconvex FA > ");
                     strcat(sys_string, volumeFilename);
                     system(sys_string);
                     if (verbose)
@@ -1276,8 +1276,8 @@ bool QuadTree::readCombinations() {
     char *token;
     char m_separator[] = " \n\t";
     char buf[512];
-    string FileName[] = {"Comb2D.txt", "Comb3D.txt", "Comb4D.txt", "Comb5D.txt", "Comb6D.txt", "Comb7D.txt",
-                         "Comb8D.txt", "Comb9D.txt"};
+    string FileName[] = {"bin/Comb2D.txt", "bin/Comb3D.txt", "bin/Comb4D.txt", "bin/Comb5D.txt", "bin/Comb6D.txt", "bin/Comb7D.txt",
+                         "bin/Comb8D.txt", "bin/Comb9D.txt"};
     string strComb;
 
     fp = fopen(FileName[Dimen - 2].c_str(), "r");

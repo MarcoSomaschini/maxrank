@@ -1,7 +1,10 @@
+.idea
+.vscode
 # CMake build directory
 cmake-build-debug
+build
 # Temporary files
 tmp/*
 !tmp/.gitkeep
 # Output file
-bin/myout.txt
+myout.txt
